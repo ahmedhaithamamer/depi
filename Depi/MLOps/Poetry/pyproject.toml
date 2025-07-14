@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "iris"
+version = "0.1.0"
+description = "a demo for an ai application"
+authors = ["iadel93 <engsmsm@gmail.com>"]
+readme = "README.md"
+include = [{path = "./iris/"}]
+
+
+[tool.poetry.dependencies]
+python = "^3.12"
+scikit-learn = "^1.6.1"
+pandas = "^2.2.3"
+matplotlib = "^3.10.3"
+streamlit = "^1.45.1"
+seaborn = "^0.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
