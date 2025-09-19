@@ -1,16 +1,6 @@
-#!/usr/bin/env python3
-"""
-Music Store Data Analysis
-A comprehensive analysis of the online music store database to answer key business questions.
-"""
-
 import pandas as pd
 import numpy as np
-from datetime import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
-import warnings
-warnings.filterwarnings('ignore')
+
 
 class MusicStoreAnalyzer:
     def __init__(self, data_path="SQL_Music_Store_Analysis-main/music store data/"):
@@ -25,7 +15,6 @@ class MusicStoreAnalyzer:
         self.artists = None
         
     def load_data(self):
-        """Load all CSV files into pandas DataFrames."""
         print("Loading data files...")
         
             # Load core tables
@@ -47,7 +36,6 @@ class MusicStoreAnalyzer:
 
     
     def clean_and_preprocess(self):
-        """Clean and preprocess the data."""
         print("\nCleaning and preprocessing data...")
         
         # Convert invoice_date to datetime
@@ -71,7 +59,6 @@ class MusicStoreAnalyzer:
         print("✓ Data cleaning completed")
     
     def get_countries_with_most_customers(self):
-        """Answer: Which country has the most customers?"""
         print("\n" + "="*60)
         print("QUESTION 1: Which country has the most customers?")
         print("="*60)
@@ -88,7 +75,6 @@ class MusicStoreAnalyzer:
         return country_counts
     
     def get_top_spending_customer(self):
-        """Answer: Which customer has spent the most money?"""
         print("\n" + "="*60)
         print("QUESTION 2: Which customer has spent the most money?")
         print("="*60)
@@ -113,7 +99,6 @@ class MusicStoreAnalyzer:
         return customer_spending
     
     def get_revenue_by_genre(self):
-        """Answer: How much revenue was generated from each music genre?"""
         print("\n" + "="*60)
         print("QUESTION 3: How much revenue was generated from each music genre?")
         print("="*60)
@@ -142,7 +127,6 @@ class MusicStoreAnalyzer:
         return genre_totals
     
     def get_average_transaction_value(self):
-        """Answer: What is the average transaction value per customer?"""
         print("\n" + "="*60)
         print("QUESTION 4: What is the average transaction value per customer?")
         print("="*60)
@@ -174,7 +158,6 @@ class MusicStoreAnalyzer:
         return customer_avg, overall_avg
     
     def get_yearly_revenue(self):
-        """Answer: What is the total revenue for each year?"""
         print("\n" + "="*60)
         print("QUESTION 5: What is the total revenue for each year?")
         print("="*60)
@@ -203,7 +186,6 @@ class MusicStoreAnalyzer:
         return yearly_revenue
     
     def generate_summary_report(self):
-        """Generate a comprehensive summary report."""
         print("\n" + "="*80)
         print("EXECUTIVE SUMMARY - MUSIC STORE ANALYSIS REPORT")
         print("="*80)
@@ -239,7 +221,6 @@ class MusicStoreAnalyzer:
         }
     
     def run_complete_analysis(self):
-        """Run the complete analysis workflow."""
         print("🎵 MUSIC STORE DATA ANALYSIS")
         print("="*80)
         
@@ -260,7 +241,6 @@ class MusicStoreAnalyzer:
         summary = self.generate_summary_report()
         
         print(f"\n✅ Analysis completed successfully!")
-        print(f"📋 Report generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         return {
             'country_counts': country_counts,
