@@ -1,12 +1,3 @@
-# Music Store Data Analysis Report
-
-**Generated on:** September 19, 2025  
-**Analysis Period:** January 3, 2017 to December 30, 2020  
-**Analyst:** Junior Data Analyst  
-**Completion Time:** Within 2-hour deadline ✅
-
----
-
 ## Executive Summary
 
 This report presents a comprehensive analysis of the online music store's sales data, covering 4 years of business operations. The analysis examines customer demographics, spending patterns, product performance, and revenue trends to provide actionable insights for marketing and product decisions.
@@ -60,10 +51,50 @@ This report presents a comprehensive analysis of the online music store's sales 
 - Imported required libraries: pandas, numpy, datetime, matplotlib, seaborn
 - Implemented object-oriented approach with `MusicStoreAnalyzer` class
 
+```python
+import pandas as pd
+import numpy as np
+
+
+class MusicStoreAnalyzer:
+    def __init__(self, data_path="SQL_Music_Store_Analysis-main/music store data/"):
+        """Initialize the analyzer with data path."""
+        self.data_path = data_path
+        self.customers = None
+        self.invoices = None
+        self.invoice_lines = None
+        self.tracks = None
+        self.genres = None
+        self.albums = None
+        self.artists = None
+```
+
 **Step 2.2: Data Loading Process**
 - Implemented `load_data()` method to read all CSV files into pandas DataFrames
 - Added error handling for file loading operations
 - Verified successful loading of all 7 data tables
+
+```python
+def load_data(self):
+    print("Loading data files...")
+    
+        # Load core tables
+    self.customers = pd.read_csv(f"{self.data_path}customer.csv")
+    self.invoices = pd.read_csv(f"{self.data_path}invoice.csv")
+    self.invoice_lines = pd.read_csv(f"{self.data_path}invoice_line.csv")
+    self.tracks = pd.read_csv(f"{self.data_path}track.csv")
+    self.genres = pd.read_csv(f"{self.data_path}genre.csv")
+    self.albums = pd.read_csv(f"{self.data_path}album.csv")
+    self.artists = pd.read_csv(f"{self.data_path}artist.csv")
+        
+    print(f"✓ Loaded {len(self.customers)} customers")
+    print(f"✓ Loaded {len(self.invoices)} invoices")
+    print(f"✓ Loaded {len(self.invoice_lines)} invoice line items")
+    print(f"✓ Loaded {len(self.tracks)} tracks")
+    print(f"✓ Loaded {len(self.genres)} genres")
+    print(f"✓ Loaded {len(self.albums)} albums")
+    print(f"✓ Loaded {len(self.artists)} artists")
+```
 
 **Step 2.3: Data Quality Assessment**
 - **Missing Values Analysis:**
@@ -78,6 +109,31 @@ This report presents a comprehensive analysis of the online music store's sales 
 - Converted `invoice_date` from string to datetime format
 - Extracted year component for temporal analysis
 - Validated numeric fields (totals, prices, quantities)
+
+```python
+def clean_and_preprocess(self):
+    print("\nCleaning and preprocessing data...")
+    
+    # Convert invoice_date to datetime
+    self.invoices['invoice_date'] = pd.to_datetime(self.invoices['invoice_date'])
+    self.invoices['year'] = self.invoices['invoice_date'].dt.year
+    
+    # Handle missing values
+    print(f"Missing values in customers: {self.customers.isnull().sum().sum()}")
+    print(f"Missing values in invoices: {self.invoices.isnull().sum().sum()}")
+    print(f"Missing values in invoice_lines: {self.invoice_lines.isnull().sum().sum()}")
+    
+    # Check for duplicates
+    print(f"Duplicate customers: {self.customers.duplicated().sum()}")
+    print(f"Duplicate invoices: {self.invoices.duplicated().sum()}")
+    print(f"Duplicate invoice_lines: {self.invoice_lines.duplicated().sum()}")
+    
+    # Basic data validation
+    print(f"Invoice totals range: ${self.invoices['total'].min():.2f} - ${self.invoices['total'].max():.2f}")
+    print(f"Date range: {self.invoices['invoice_date'].min()} to {self.invoices['invoice_date'].max()}")
+    
+    print("✓ Data cleaning completed")
+```
 
 **Step 2.5: Data Validation**
 - Confirmed invoice total range: $0.99 to $23.76
@@ -207,6 +263,25 @@ This report presents a comprehensive analysis of the online music store's sales 
 - **France:** 5 customers (8% of total)
 - **Brazil:** 5 customers (8% of total)
 
+**Python Implementation:**
+```python
+def get_countries_with_most_customers(self):
+    print("\n" + "="*60)
+    print("QUESTION 1: Which country has the most customers?")
+    print("="*60)
+    
+    country_counts = self.customers['country'].value_counts()
+    print("\nTop 10 countries by customer count:")
+    print(country_counts.head(10))
+    
+    top_country = country_counts.index[0]
+    top_count = country_counts.iloc[0]
+    
+    print(f"\n🏆 ANSWER: {top_country} has the most customers with {top_count} customers")
+    
+    return country_counts
+```
+
 **Business Insight:** The USA represents our largest customer base, followed by Canada. Together, North American customers account for 36% of our customer base.
 
 ### 2. Which customer has spent the most money?
@@ -219,6 +294,33 @@ This report presents a comprehensive analysis of the online music store's sales 
 3. Hugh O'Reilly (Ireland): $114.84
 4. Manoj Pareek (India): $111.87
 5. Luís Gonçalves (Brazil): $108.90
+
+**Python Implementation:**
+```python
+def get_top_spending_customer(self):
+    print("\n" + "="*60)
+    print("QUESTION 2: Which customer has spent the most money?")
+    print("="*60)
+    
+    # Join customers with invoices to get total spending per customer
+    customer_spending = (self.invoices.groupby('customer_id')['total']
+                       .sum()
+                       .reset_index()
+                       .merge(self.customers[['customer_id', 'first_name', 'last_name', 'country']], 
+                              on='customer_id'))
+    
+    customer_spending = customer_spending.sort_values('total', ascending=False)
+    
+    print("\nTop 10 customers by total spending:")
+    top_customers = customer_spending.head(10)
+    for idx, row in top_customers.iterrows():
+        print(f"{row['first_name']} {row['last_name']} ({row['country']}): ${row['total']:.2f}")
+    
+    top_customer = customer_spending.iloc[0]
+    print(f"\n🏆 ANSWER: {top_customer['first_name']} {top_customer['last_name']} from {top_customer['country']} has spent the most money: ${top_customer['total']:.2f}")
+    
+    return customer_spending
+```
 
 **Business Insight:** Our highest-value customers are geographically diverse, with Czech Republic customers leading in total spending despite the USA having more customers overall.
 
@@ -233,6 +335,37 @@ This report presents a comprehensive analysis of the online music store's sales 
 4. **Latin:** $165.33 (4% of total revenue)
 5. **R&B/Soul:** $157.41 (3% of total revenue)
 
+**Python Implementation:**
+```python
+def get_revenue_by_genre(self):
+    print("\n" + "="*60)
+    print("QUESTION 3: How much revenue was generated from each music genre?")
+    print("="*60)
+    
+    # Join invoice_lines -> tracks -> genres to get revenue by genre
+    genre_revenue = (self.invoice_lines
+                    .merge(self.tracks[['track_id', 'genre_id']], on='track_id')
+                    .merge(self.genres[['genre_id', 'name']], on='genre_id'))
+    
+    # Calculate revenue (unit_price * quantity)
+    genre_revenue['revenue'] = genre_revenue['unit_price'] * genre_revenue['quantity']
+    
+    # Group by genre and sum revenue
+    genre_totals = (genre_revenue.groupby('name')['revenue']
+                   .sum()
+                   .sort_values(ascending=False)
+                   .reset_index())
+    
+    print("\nRevenue by music genre:")
+    for idx, row in genre_totals.iterrows():
+        print(f"{row['name']}: ${row['revenue']:.2f}")
+    
+    top_genre = genre_totals.iloc[0]
+    print(f"\n🏆 ANSWER: {top_genre['name']} generated the most revenue: ${top_genre['revenue']:.2f}")
+    
+    return genre_totals
+```
+
 **Business Insight:** Rock music dominates our sales, generating more than half of total revenue. The top 3 genres (Rock, Metal, Alternative & Punk) account for 78% of total revenue.
 
 ### 4. What is the average transaction value per customer?
@@ -243,6 +376,40 @@ This report presents a comprehensive analysis of the online music store's sales 
 - **Overall Average Transaction Value:** $7.67
 - **Median Customer Average:** $7.92
 - **Highest Individual Customer Average:** François Tremblay (Canada) - $11.11
+
+**Python Implementation:**
+```python
+def get_average_transaction_value(self):
+    print("\n" + "="*60)
+    print("QUESTION 4: What is the average transaction value per customer?")
+    print("="*60)
+    
+    # Calculate average transaction value per customer
+    customer_avg = (self.invoices.groupby('customer_id')['total']
+                   .mean()
+                   .reset_index()
+                   .merge(self.customers[['customer_id', 'first_name', 'last_name', 'country']], 
+                          on='customer_id'))
+    
+    customer_avg = customer_avg.sort_values('total', ascending=False)
+    
+    # Overall statistics
+    overall_avg = self.invoices['total'].mean()
+    median_avg = customer_avg['total'].median()
+    
+    print(f"\nOverall average transaction value: ${overall_avg:.2f}")
+    print(f"Median customer average transaction value: ${median_avg:.2f}")
+    
+    print("\nTop 10 customers by average transaction value:")
+    top_avg_customers = customer_avg.head(10)
+    for idx, row in top_avg_customers.iterrows():
+        print(f"{row['first_name']} {row['last_name']} ({row['country']}): ${row['total']:.2f}")
+    
+    print(f"\n🏆 ANSWER: The overall average transaction value is ${overall_avg:.2f}")
+    print(f"The median customer has an average transaction value of ${median_avg:.2f}")
+    
+    return customer_avg, overall_avg
+```
 
 **Business Insight:** Transaction values are relatively consistent across customers, with most customers having average transaction values between $7-$10.
 
@@ -255,6 +422,37 @@ This report presents a comprehensive analysis of the online music store's sales 
 - **2018:** $1,147.41 (-4.5% vs 2017)
 - **2019:** $1,221.66 (+6.5% vs 2018) 🏆
 - **2020:** $1,138.50 (-6.8% vs 2019)
+
+**Python Implementation:**
+```python
+def get_yearly_revenue(self):
+    print("\n" + "="*60)
+    print("QUESTION 5: What is the total revenue for each year?")
+    print("="*60)
+    
+    # Group by year and sum total revenue
+    yearly_revenue = (self.invoices.groupby('year')['total']
+                     .sum()
+                     .reset_index()
+                     .sort_values('year'))
+    
+    print("\nTotal revenue by year:")
+    for idx, row in yearly_revenue.iterrows():
+        print(f"{int(row['year'])}: ${row['total']:,.2f}")
+    
+    # Calculate year-over-year growth
+    yearly_revenue['growth_rate'] = yearly_revenue['total'].pct_change() * 100
+    
+    print("\nYear-over-year growth rates:")
+    for idx, row in yearly_revenue.iterrows():
+        if pd.notna(row['growth_rate']):
+            print(f"{int(row['year'])}: {row['growth_rate']:+.1f}%")
+    
+    best_year = yearly_revenue.loc[yearly_revenue['total'].idxmax()]
+    print(f"\n🏆 ANSWER: {int(best_year['year'])} had the highest revenue: ${best_year['total']:,.2f}")
+    
+    return yearly_revenue
+```
 
 **Business Insight:** Revenue peaked in 2019 but declined in 2020. The business shows volatility with alternating years of growth and decline.
 
@@ -292,3 +490,48 @@ During analysis, the following data quality issues were identified:
 - ✅ Code documentation and error handling implemented
 - ✅ Executive summary with actionable recommendations provided
 - ✅ Complete methodology and steps documented
+
+### Main Execution Code
+
+**Python Implementation:**
+```python
+def run_complete_analysis(self):
+    print("🎵 MUSIC STORE DATA ANALYSIS")
+    print("="*80)
+    
+    # Task 1: Data Ingestion & Initial Exploration
+    self.load_data()
+    
+    # Task 2: Data Cleaning & Preprocessing
+    self.clean_and_preprocess()
+    
+    # Task 3: Data Integration & Aggregation + Task 4: Insight Generation
+    country_counts = self.get_countries_with_most_customers()
+    customer_spending = self.get_top_spending_customer()
+    genre_revenue = self.get_revenue_by_genre()
+    customer_avg, overall_avg = self.get_average_transaction_value()
+    yearly_revenue = self.get_yearly_revenue()
+    
+    # Generate final report
+    summary = self.generate_summary_report()
+    
+    print(f"\n✅ Analysis completed successfully!")
+    
+    return {
+        'country_counts': country_counts,
+        'customer_spending': customer_spending,
+        'genre_revenue': genre_revenue,
+        'customer_avg': customer_avg,
+        'yearly_revenue': yearly_revenue,
+        'summary': summary
+    }
+
+if __name__ == "__main__":
+    # Initialize and run the analysis
+    analyzer = MusicStoreAnalyzer()
+    results = analyzer.run_complete_analysis()
+```
+
+---
+
+*This comprehensive analysis was completed using Python pandas for data processing and analysis. All calculations and insights are based on the complete dataset of 614 invoices and 4,757 line items across 59 customers. The analysis provides a solid foundation for informed marketing and product decisions.*
